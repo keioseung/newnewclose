@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { X, Heart, MessageCircle, Share, ThumbsUp } from 'lucide-react'
 import ReactPlayer from 'react-player'
 import { Video, Comment } from '@/types/video'
-import { videoApi } from './lib/api'
+import { videoApi } from '@/components/lib/api'
 import toast from 'react-hot-toast'
 
 interface VideoModalProps {

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Video } from '@/types/video'
 import VideoCard from './VideoCard'
-import { videoApi } from './lib/api'
+import { videoApi } from '@/components/lib/api'
 
 interface VideoGridProps {
   currentFilter: string
