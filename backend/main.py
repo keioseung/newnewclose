@@ -3,8 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import List, Optional
-import firebase_admin
-from firebase_admin import credentials, firestore
 import os
 from datetime import datetime, timedelta
 import re
@@ -12,12 +10,13 @@ import requests
 from bs4 import BeautifulSoup
 import yt_dlp
 
-# Firebase 초기화
-if not firebase_admin._apps:
-    cred = credentials.Certificate("firebase-key.json")
-    firebase_admin.initialize_app(cred)
-
-db = firestore.client()
+# Mock 데이터 저장소
+mock_videos = []
+mock_groups = [
+    {"id": "1", "name": "가족", "memberCount": 4},
+    {"id": "2", "name": "친구들", "memberCount": 6},
+    {"id": "3", "name": "팀 프로젝트", "memberCount": 3},
+]
 
 app = FastAPI(
     title="CloseTube API",
@@ -192,36 +191,64 @@ async def parse_url(request: UrlParseRequest):
 @app.get("/videos", response_model=List[VideoResponse])
 async def get_videos():
     """모든 비디오를 가져옵니다."""
-    try:
-        videos_ref = db.collection('videos')
-        docs = videos_ref.stream()
-        
-        videos = []
-        for doc in docs:
-            video_data = doc.to_dict()
-            video_data['id'] = doc.id
-            videos.append(VideoResponse(**video_data))
-        
-        return videos
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"비디오 조회 실패: {str(e)}")
+    # Mock 데이터 반환
+    mock_data = [
+        {
+            "id": "1",
+            "title": "가족 여행 하이라이트",
+            "description": "올해 여름 가족과 함께한 특별한 여행",
+            "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            "thumbnail": "https://via.placeholder.com/320x180/3b82f6/ffffff?text=가족+여행",
+            "duration": "3:24",
+            "author": "엄마",
+            "views": 12,
+            "likes": 8,
+            "comments": 3,
+            "createdAt": "2일 전",
+            "group": "가족",
+            "privacy": {"downloadDisabled": True, "externalShareDisabled": True}
+        },
+        {
+            "id": "2",
+            "title": "파스타 만들기 클래스",
+            "description": "집에서 쉽게 만드는 맛있는 파스타",
+            "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            "thumbnail": "https://via.placeholder.com/320x180/10b981/ffffff?text=요리+클래스",
+            "duration": "8:15",
+            "author": "친구 민수",
+            "views": 5,
+            "likes": 12,
+            "comments": 7,
+            "createdAt": "1주일 전",
+            "group": "친구들",
+            "privacy": {"downloadDisabled": True, "externalShareDisabled": True}
+        }
+    ]
+    return [VideoResponse(**video) for video in mock_data]
 
 @app.get("/videos/group/{group}", response_model=List[VideoResponse])
 async def get_videos_by_group(group: str):
     """특정 그룹의 비디오를 가져옵니다."""
-    try:
-        videos_ref = db.collection('videos')
-        docs = videos_ref.where('group', '==', group).stream()
-        
-        videos = []
-        for doc in docs:
-            video_data = doc.to_dict()
-            video_data['id'] = doc.id
-            videos.append(VideoResponse(**video_data))
-        
-        return videos
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"그룹별 비디오 조회 실패: {str(e)}")
+    # Mock 데이터에서 그룹별 필터링
+    mock_data = [
+        {
+            "id": "1",
+            "title": "가족 여행 하이라이트",
+            "description": "올해 여름 가족과 함께한 특별한 여행",
+            "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            "thumbnail": "https://via.placeholder.com/320x180/3b82f6/ffffff?text=가족+여행",
+            "duration": "3:24",
+            "author": "엄마",
+            "views": 12,
+            "likes": 8,
+            "comments": 3,
+            "createdAt": "2일 전",
+            "group": "가족",
+            "privacy": {"downloadDisabled": True, "externalShareDisabled": True}
+        }
+    ]
+    filtered_videos = [v for v in mock_data if v["group"] == group]
+    return [VideoResponse(**video) for video in filtered_videos]
 
 @app.get("/videos/{video_id}", response_model=VideoResponse)
 async def get_video(video_id: str):
@@ -242,74 +269,43 @@ async def get_video(video_id: str):
 @app.post("/videos", response_model=VideoResponse)
 async def create_video(video: VideoCreate):
     """새 비디오를 생성합니다."""
-    try:
-        # URL에서 비디오 정보 파싱
-        video_info = parse_video_url(video.url)
-        
-        # Firestore에 저장할 데이터
-        video_data = {
-            "title": video.title or video_info["title"],
-            "description": video.description or video_info["description"],
-            "url": video.url,
-            "thumbnail": video_info["thumbnail"],
-            "duration": video_info["duration"],
-            "author": video_info["author"],
-            "views": 0,
-            "likes": 0,
-            "comments": 0,
-            "createdAt": datetime.now().isoformat(),
-            "group": video.group,
-            "privacy": video.privacy
-        }
-        
-        # Firestore에 저장
-        doc_ref = db.collection('videos').add(video_data)
-        video_data['id'] = doc_ref[1].id
-        
-        return VideoResponse(**video_data)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"비디오 생성 실패: {str(e)}")
+    # Mock 비디오 생성
+    video_data = {
+        "id": str(len(mock_videos) + 1),
+        "title": video.title,
+        "description": video.description,
+        "url": video.url,
+        "thumbnail": "https://via.placeholder.com/320x180/3b82f6/ffffff?text=새+영상",
+        "duration": "5:30",
+        "author": "사용자",
+        "views": 0,
+        "likes": 0,
+        "comments": 0,
+        "createdAt": datetime.now().isoformat(),
+        "group": video.group,
+        "privacy": video.privacy
+    }
+    
+    mock_videos.append(video_data)
+    return VideoResponse(**video_data)
 
 @app.post("/videos/{video_id}/like")
 async def like_video(video_id: str):
     """비디오에 좋아요를 추가합니다."""
-    try:
-        video_ref = db.collection('videos').document(video_id)
-        video_ref.update({
-            'likes': firestore.Increment(1)
-        })
-        return {"message": "좋아요가 추가되었습니다"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"좋아요 처리 실패: {str(e)}")
+    # Mock 좋아요 처리
+    return {"message": "좋아요가 추가되었습니다"}
 
 @app.post("/videos/{video_id}/view")
 async def increment_views(video_id: str):
     """비디오 조회수를 증가시킵니다."""
-    try:
-        video_ref = db.collection('videos').document(video_id)
-        video_ref.update({
-            'views': firestore.Increment(1)
-        })
-        return {"message": "조회수가 증가되었습니다"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"조회수 증가 실패: {str(e)}")
+    # Mock 조회수 증가
+    return {"message": "조회수가 증가되었습니다"}
 
 @app.get("/groups")
 async def get_groups():
     """모든 그룹을 가져옵니다."""
-    try:
-        groups_ref = db.collection('groups')
-        docs = groups_ref.stream()
-        
-        groups = []
-        for doc in docs:
-            group_data = doc.to_dict()
-            group_data['id'] = doc.id
-            groups.append(group_data)
-        
-        return groups
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"그룹 조회 실패: {str(e)}")
+    # Mock 그룹 데이터 반환
+    return mock_groups
 
 if __name__ == "__main__":
     import uvicorn
