@@ -4,8 +4,27 @@ import { useState, useEffect } from 'react'
 import { X, Heart, MessageCircle, Share, ThumbsUp } from 'lucide-react'
 import ReactPlayer from 'react-player'
 import { Video, Comment } from '@/types/video'
-import { videoApi } from '@/components/lib/api'
+import axios from 'axios'
 import toast from 'react-hot-toast'
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+// API 함수들
+const videoApi = {
+  like: async (id: string): Promise<void> => {
+    await api.post(`/videos/${id}/like`)
+  },
+  incrementViews: async (id: string): Promise<void> => {
+    await api.post(`/videos/${id}/view`)
+  },
+}
 
 interface VideoModalProps {
   isOpen: boolean

@@ -3,7 +3,28 @@
 import { useState, useEffect } from 'react'
 import { Video } from '@/types/video'
 import VideoCard from './VideoCard'
-import { videoApi } from '@/components/lib/api'
+import axios from 'axios'
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+// API 함수들
+const videoApi = {
+  getAll: async (): Promise<Video[]> => {
+    const response = await api.get('/videos')
+    return response.data
+  },
+  getByGroup: async (group: string): Promise<Video[]> => {
+    const response = await api.get(`/videos/group/${group}`)
+    return response.data
+  },
+}
 
 interface VideoGridProps {
   currentFilter: string

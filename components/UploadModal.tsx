@@ -4,8 +4,32 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { X, Upload, Link, Check } from 'lucide-react'
 import { VideoUploadData } from '@/types/video'
-import { videoApi, urlApi } from '@/components/lib/api'
+import axios from 'axios'
 import toast from 'react-hot-toast'
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+// API 함수들
+const videoApi = {
+  upload: async (videoData: VideoUploadData) => {
+    const response = await api.post('/videos', videoData)
+    return response.data
+  },
+}
+
+const urlApi = {
+  parseVideoUrl: async (url: string) => {
+    const response = await api.post('/parse-url', { url })
+    return response.data
+  },
+}
 
 interface UploadModalProps {
   isOpen: boolean
