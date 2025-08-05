@@ -156,6 +156,7 @@ const mockVideos: Video[] = [
 export default function VideoGrid({ currentFilter, onFilterChange, onVideoClick }: VideoGridProps) {
   const [videos, setVideos] = useState<Video[]>(mockVideos)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -172,6 +173,7 @@ export default function VideoGrid({ currentFilter, onFilterChange, onVideoClick 
         setVideos(fetchedVideos)
       } catch (error) {
         console.error('Failed to fetch videos:', error)
+        setError('영상을 불러오는데 실패했습니다.')
         // 에러 시에도 mock 데이터 유지
       } finally {
         setLoading(false)
