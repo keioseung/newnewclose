@@ -1,12 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import Sidebar from '@/components/Sidebar'
-import Header from '@/components/Header'
-import VideoGrid from '@/components/VideoGrid'
-import UploadModal from '@/components/UploadModal'
-import VideoModal from '@/components/VideoModal'
-import { Video } from '@/types/video'
+import Sidebar from '../components/Sidebar'
+import Header from '../components/Header'
+import VideoGrid from '../components/VideoGrid'
+import UploadModal from '../components/UploadModal'
+import VideoModal from '../components/VideoModal'
+import { Video } from '../types/video'
 
 export default function Home() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false)
