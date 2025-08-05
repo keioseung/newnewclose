@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { X, Upload, Link, Check } from 'lucide-react'
 import { VideoUploadData } from '@/types/video'
-import { videoApi, urlApi } from '@/lib/api'
+import { videoApi, urlApi } from '../lib/api'
 import toast from 'react-hot-toast'
 
 interface UploadModalProps {
