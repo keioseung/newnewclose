@@ -21,10 +21,10 @@ export default function Sidebar() {
     {
       section: '내 채널',
       items: [
-        { icon: Home, label: '홈', active: true },
-        { icon: Video, label: '내 영상', active: false },
-        { icon: Heart, label: '좋아요', active: false },
-        { icon: Clock, label: '시청 기록', active: false },
+        { icon: Home, label: '홈', active: true, count: undefined },
+        { icon: Video, label: '내 영상', active: false, count: undefined },
+        { icon: Heart, label: '좋아요', active: false, count: undefined },
+        { icon: Clock, label: '시청 기록', active: false, count: undefined },
       ]
     },
     {
@@ -38,9 +38,9 @@ export default function Sidebar() {
     {
       section: '도구',
       items: [
-        { icon: Plus, label: '새 그룹 만들기', active: false },
-        { icon: UserPlus, label: '멤버 초대', active: false },
-        { icon: Settings, label: '설정', active: false },
+        { icon: Plus, label: '새 그룹 만들기', active: false, count: undefined },
+        { icon: UserPlus, label: '멤버 초대', active: false, count: undefined },
+        { icon: Settings, label: '설정', active: false, count: undefined },
       ]
     }
   ]
