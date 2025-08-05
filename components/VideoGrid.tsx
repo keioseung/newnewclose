@@ -159,28 +159,12 @@ export default function VideoGrid({ currentFilter, onFilterChange, onVideoClick 
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchVideos = async () => {
-      setLoading(true)
-      try {
-        let fetchedVideos: Video[]
-        if (currentFilter === '전체') {
-          fetchedVideos = await videoApi.getAll()
-        } else if (['가족', '친구들', '팀 프로젝트'].includes(currentFilter)) {
-          fetchedVideos = await videoApi.getByGroup(currentFilter)
-        } else {
-          fetchedVideos = await videoApi.getAll()
-        }
-        setVideos(fetchedVideos)
-      } catch (error) {
-        console.error('Failed to fetch videos:', error)
-        setError('영상을 불러오는데 실패했습니다.')
-        // 에러 시에도 mock 데이터 유지
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchVideos()
+    // API 호출 대신 mock 데이터만 사용
+    setLoading(true)
+    setTimeout(() => {
+      setVideos(mockVideos)
+      setLoading(false)
+    }, 500)
   }, [currentFilter])
 
   const filteredVideos = videos.filter(video => {

@@ -60,16 +60,18 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
       return
     }
 
-    try {
-      const videoInfo = await urlApi.parseVideoUrl(url)
-      setParsedVideo(videoInfo)
-      setIsUrlValid(true)
-      
-      // 자동으로 제목과 썸네일 설정
-      if (videoInfo.title) {
-        setValue('title', videoInfo.title)
+    // Mock URL validation
+    if (url.includes('youtube.com') || url.includes('instagram.com') || url.includes('tiktok.com')) {
+      const mockResult = {
+        title: '샘플 영상 제목',
+        description: '샘플 영상 설명입니다.',
+        thumbnail: 'https://via.placeholder.com/320x180/3b82f6/ffffff?text=샘플+영상',
+        duration: '5:30'
       }
-    } catch (error) {
+      setParsedVideo(mockResult)
+      setIsUrlValid(true)
+      setValue('title', mockResult.title)
+    } else {
       setIsUrlValid(false)
       setParsedVideo(null)
     }
@@ -83,7 +85,8 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
 
     setIsLoading(true)
     try {
-      await videoApi.upload(data)
+      // API 호출 대신 mock 처리
+      await new Promise(resolve => setTimeout(resolve, 1500))
       toast.success('영상이 성공적으로 업로드되었습니다!')
       reset()
       setParsedVideo(null)

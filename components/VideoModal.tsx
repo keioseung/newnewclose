@@ -67,13 +67,9 @@ export default function VideoModal({ isOpen, video, onClose }: VideoModalProps) 
   const handleLike = async () => {
     if (!video) return
 
-    try {
-      await videoApi.like(video.id)
-      setIsLiked(!isLiked)
-      toast.success(isLiked ? '좋아요를 취소했습니다' : '좋아요를 눌렀습니다')
-    } catch (error) {
-      toast.error('좋아요 처리에 실패했습니다')
-    }
+    // Mock like functionality
+    setIsLiked(!isLiked)
+    toast.success(isLiked ? '좋아요를 취소했습니다' : '좋아요를 눌렀습니다')
   }
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
