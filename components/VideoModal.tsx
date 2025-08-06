@@ -34,6 +34,7 @@ const likeVideo = async (videoId: string): Promise<Video> => {
 
 // YouTube URL을 임베드 URL로 변환하는 함수
 const getEmbedUrl = (url: string): string => {
+  // YouTube 처리
   if (url.includes('youtube.com/watch?v=')) {
     const videoId = url.split('v=')[1]?.split('&')[0];
     return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
@@ -41,6 +42,22 @@ const getEmbedUrl = (url: string): string => {
     const videoId = url.split('youtu.be/')[1]?.split('?')[0];
     return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
   }
+  
+  // Instagram 처리
+  else if (url.includes('instagram.com/p/')) {
+    const postId = url.split('/p/')[1]?.split('/')[0];
+    return postId ? `https://www.instagram.com/p/${postId}/embed/` : url;
+  } else if (url.includes('instagram.com/reel/')) {
+    const reelId = url.split('/reel/')[1]?.split('/')[0];
+    return reelId ? `https://www.instagram.com/reel/${reelId}/embed/` : url;
+  }
+  
+  // TikTok 처리
+  else if (url.includes('tiktok.com/') && url.includes('/video/')) {
+    const videoId = url.split('/video/')[1]?.split('?')[0];
+    return videoId ? `https://www.tiktok.com/embed/v2/${videoId}` : url;
+  }
+  
   return url;
 };
 

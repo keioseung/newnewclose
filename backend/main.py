@@ -387,11 +387,24 @@ async def parse_video_url(url: str = Form(...)):
             ]
         elif "instagram.com" in url:
             platform = "Instagram"
-            embed_url = url
+            # Instagram 임베드 URL 생성
+            if "/p/" in url:
+                post_id = url.split("/p/")[1].split("/")[0]
+                embed_url = f"https://www.instagram.com/p/{post_id}/embed/"
+            elif "/reel/" in url:
+                reel_id = url.split("/reel/")[1].split("/")[0]
+                embed_url = f"https://www.instagram.com/reel/{reel_id}/embed/"
+            else:
+                embed_url = url
             thumbnail = "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=320&h=180&fit=crop&crop=center"
         elif "tiktok.com" in url:
             platform = "TikTok"
-            embed_url = url
+            # TikTok 임베드 URL 생성
+            if "/video/" in url:
+                video_id = url.split("/video/")[1].split("?")[0]
+                embed_url = f"https://www.tiktok.com/embed/v2/{video_id}"
+            else:
+                embed_url = url
             thumbnail = "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=320&h=180&fit=crop&crop=center"
         else:
             platform = "Unknown"
