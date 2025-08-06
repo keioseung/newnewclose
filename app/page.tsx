@@ -7,8 +7,12 @@ import VideoGrid from '@/components/VideoGrid';
 import UploadModal from '@/components/UploadModal';
 import VideoModal from '@/components/VideoModal';
 import StatsDashboard from '@/components/StatsDashboard';
+import RecommendModal from '@/components/RecommendModal';
+import MemoryBox from '@/components/MemoryBox';
 import { Video } from '@/types/video';
 import { FilterOptions } from '@/components/SearchBar';
+import { RecommendationData } from '@/components/RecommendModal';
+import { MemoryData } from '@/components/MemoryBox';
 
 export default function Home() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -17,6 +21,9 @@ export default function Home() {
   const [selectedGroup, setSelectedGroup] = useState<string | undefined>();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isStatsOpen, setIsStatsOpen] = useState(false);
+  const [isRecommendOpen, setIsRecommendOpen] = useState(false);
+  const [isMemoryOpen, setIsMemoryOpen] = useState(false);
+  const [selectedVideoForAction, setSelectedVideoForAction] = useState<Video | null>(null);
   const [videos, setVideos] = useState<Video[]>([]);
   const [filteredVideos, setFilteredVideos] = useState<Video[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -123,6 +130,40 @@ export default function Home() {
     setFilters(newFilters);
   };
 
+  const handleRecommend = (video: Video) => {
+    setSelectedVideoForAction(video);
+    setIsRecommendOpen(true);
+  };
+
+  const handleSaveMemory = (video: Video) => {
+    setSelectedVideoForAction(video);
+    setIsMemoryOpen(true);
+  };
+
+  const handleRecommendSubmit = async (recommendation: RecommendationData) => {
+    try {
+      // TODO: API 호출로 추천 데이터 저장
+      console.log('추천 데이터:', recommendation);
+      // 성공 메시지 표시
+      alert(`${recommendation.friendIds.length}명의 친구에게 영상을 추천했습니다!`);
+    } catch (error) {
+      console.error('추천 실패:', error);
+      alert('추천에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+
+  const handleSaveMemorySubmit = async (memory: MemoryData) => {
+    try {
+      // TODO: API 호출로 추억 데이터 저장
+      console.log('추억 데이터:', memory);
+      // 성공 메시지 표시
+      alert('추억이 성공적으로 저장되었습니다!');
+    } catch (error) {
+      console.error('추억 저장 실패:', error);
+      alert('추억 저장에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* 사이드바 - 모바일에서는 오버레이 */}
@@ -144,6 +185,7 @@ export default function Home() {
           onUploadClick={() => setIsUploadModalOpen(true)}
           onMenuClick={() => setIsSidebarOpen(true)}
           onStatsClick={() => setIsStatsOpen(true)}
+          onMemoryClick={() => setIsMemoryOpen(true)}
           onSearch={handleSearch}
           onFilterChange={handleFilterChange}
         />
@@ -153,6 +195,8 @@ export default function Home() {
           <VideoGrid 
             videos={filteredVideos}
             onVideoSelect={handleVideoSelect}
+            onRecommend={handleRecommend}
+            onSaveMemory={handleSaveMemory}
           />
         </main>
       </div>
@@ -179,6 +223,27 @@ export default function Home() {
         videos={videos}
         isOpen={isStatsOpen}
         onClose={() => setIsStatsOpen(false)}
+      />
+
+      {/* 영상 추천 모달 */}
+      <RecommendModal
+        video={selectedVideoForAction}
+        isOpen={isRecommendOpen}
+        onClose={() => {
+          setIsRecommendOpen(false);
+          setSelectedVideoForAction(null);
+        }}
+        onRecommend={handleRecommendSubmit}
+      />
+
+      {/* 추억 상자 모달 */}
+      <MemoryBox
+        isOpen={isMemoryOpen}
+        onClose={() => {
+          setIsMemoryOpen(false);
+          setSelectedVideoForAction(null);
+        }}
+        onSaveMemory={handleSaveMemorySubmit}
       />
     </div>
   );

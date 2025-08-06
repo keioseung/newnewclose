@@ -1,14 +1,16 @@
 'use client'
 
-import { Play, Heart, MessageCircle } from 'lucide-react'
+import { Play, Heart, MessageCircle, Share2, Bookmark } from 'lucide-react'
 import { Video } from '@/types/video'
 
 interface VideoCardProps {
   video: Video
   onClick: () => void
+  onRecommend?: () => void
+  onSaveMemory?: () => void
 }
 
-export default function VideoCard({ video, onClick }: VideoCardProps) {
+export default function VideoCard({ video, onClick, onRecommend, onSaveMemory }: VideoCardProps) {
   return (
     <div 
       className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer group active:scale-95 md:active:scale-100"
@@ -46,6 +48,34 @@ export default function VideoCard({ video, onClick }: VideoCardProps) {
         {/* 재생 시간 */}
         <div className="absolute bottom-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded">
           {video.duration}
+        </div>
+
+        {/* 액션 버튼들 */}
+        <div className="absolute top-2 right-2 flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          {onRecommend && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onRecommend();
+              }}
+              className="p-1.5 bg-white bg-opacity-90 rounded-full hover:bg-opacity-100 transition-all duration-200"
+              title="친구에게 추천"
+            >
+              <Share2 className="w-3 h-3 text-gray-700" />
+            </button>
+          )}
+          {onSaveMemory && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onSaveMemory();
+              }}
+              className="p-1.5 bg-white bg-opacity-90 rounded-full hover:bg-opacity-100 transition-all duration-200"
+              title="추억으로 저장"
+            >
+              <Bookmark className="w-3 h-3 text-gray-700" />
+            </button>
+          )}
         </div>
       </div>
 

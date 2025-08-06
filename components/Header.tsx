@@ -1,18 +1,19 @@
 'use client'
 
 import { useState } from 'react'
-import { Search, Plus, Menu, Bell, BarChart3, Settings, User } from 'lucide-react'
+import { Search, Plus, Menu, Bell, BarChart3, Settings, User, Heart } from 'lucide-react'
 import SearchBar, { FilterOptions } from './SearchBar'
 
 interface HeaderProps {
   onUploadClick: () => void
   onMenuClick: () => void
   onStatsClick: () => void
+  onMemoryClick: () => void
   onSearch: (query: string) => void
   onFilterChange: (filters: FilterOptions) => void
 }
 
-export default function Header({ onUploadClick, onMenuClick, onStatsClick, onSearch, onFilterChange }: HeaderProps) {
+export default function Header({ onUploadClick, onMenuClick, onStatsClick, onMemoryClick, onSearch, onFilterChange }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState('')
 
   return (
@@ -53,6 +54,15 @@ export default function Header({ onUploadClick, onMenuClick, onStatsClick, onSea
             title="통계 보기"
           >
             <BarChart3 className="w-5 h-5" />
+          </button>
+
+          {/* 추억 상자 버튼 */}
+          <button
+            onClick={onMemoryClick}
+            className="p-2 rounded-lg hover:bg-gray-100 transition-all duration-200 text-gray-600 hover:text-accent-600"
+            title="추억 상자"
+          >
+            <Heart className="w-5 h-5" />
           </button>
 
           {/* 업로드 버튼 */}

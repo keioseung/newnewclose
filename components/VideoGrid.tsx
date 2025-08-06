@@ -31,9 +31,11 @@ const getVideosByGroup = async (group: string): Promise<Video[]> => {
 interface VideoGridProps {
   videos: Video[];
   onVideoSelect: (video: Video) => void;
+  onRecommend?: (video: Video) => void;
+  onSaveMemory?: (video: Video) => void;
 }
 
-export default function VideoGrid({ videos, onVideoSelect }: VideoGridProps) {
+export default function VideoGrid({ videos, onVideoSelect, onRecommend, onSaveMemory }: VideoGridProps) {
   if (videos.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -52,6 +54,8 @@ export default function VideoGrid({ videos, onVideoSelect }: VideoGridProps) {
           key={video.id}
           video={video}
           onClick={() => onVideoSelect(video)}
+          onRecommend={onRecommend ? () => onRecommend(video) : undefined}
+          onSaveMemory={onSaveMemory ? () => onSaveMemory(video) : undefined}
         />
       ))}
     </div>
