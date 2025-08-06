@@ -31,7 +31,7 @@ app = FastAPI(
 )
 
 # CORS 설정
-origins = os.getenv("CORS_ORIGINS", "*").split(",")
+origins = os.getenv("CORS_ORIGINS", "https://newclose-production.up.railway.app").split(",")
 print(f"CORS origins: {origins}")
 
 app.add_middleware(
