@@ -5,21 +5,25 @@ import { Search, Plus, Menu, Bell } from 'lucide-react'
 
 interface HeaderProps {
   onUploadClick: () => void
+  onMenuClick: () => void
 }
 
-export default function Header({ onUploadClick }: HeaderProps) {
+export default function Header({ onUploadClick, onMenuClick }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState('')
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4">
+    <header className="bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4">
       <div className="flex items-center justify-between">
         {/* 왼쪽 영역 */}
-        <div className="flex items-center space-x-4">
-          <button className="p-2 rounded-md hover:bg-gray-100 transition-colors lg:hidden">
+        <div className="flex items-center space-x-3 md:space-x-4">
+          <button 
+            onClick={onMenuClick}
+            className="p-2 rounded-md hover:bg-gray-100 transition-colors md:hidden"
+          >
             <Menu className="w-5 h-5 text-gray-600" />
           </button>
           
-          {/* 검색바 */}
+          {/* 검색바 - 데스크톱 */}
           <div className="relative hidden md:block">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
@@ -33,11 +37,11 @@ export default function Header({ onUploadClick }: HeaderProps) {
         </div>
 
         {/* 오른쪽 영역 */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 md:space-x-4">
           {/* 업로드 버튼 */}
           <button
             onClick={onUploadClick}
-            className="flex items-center space-x-2 bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-600 transition-colors"
+            className="flex items-center space-x-2 bg-primary-500 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-primary-600 transition-colors"
           >
             <Plus className="w-4 h-4" />
             <span className="hidden sm:inline">영상 업로드</span>
@@ -50,7 +54,7 @@ export default function Header({ onUploadClick }: HeaderProps) {
           </button>
 
           {/* 사용자 프로필 */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 md:space-x-3">
             <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
               <span className="text-white text-sm font-medium">마</span>
             </div>
@@ -60,7 +64,7 @@ export default function Header({ onUploadClick }: HeaderProps) {
       </div>
 
       {/* 모바일 검색바 */}
-      <div className="mt-4 md:hidden">
+      <div className="mt-3 md:hidden">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input

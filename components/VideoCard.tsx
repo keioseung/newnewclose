@@ -11,7 +11,7 @@ interface VideoCardProps {
 export default function VideoCard({ video, onClick }: VideoCardProps) {
   return (
     <div 
-      className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer group"
+      className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer group active:scale-95 md:active:scale-100"
       onClick={onClick}
     >
       {/* 썸네일 */}
@@ -24,8 +24,8 @@ export default function VideoCard({ video, onClick }: VideoCardProps) {
         
         {/* 재생 오버레이 */}
         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
-          <div className="w-12 h-12 bg-white bg-opacity-90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <Play className="w-5 h-5 text-gray-800 ml-1" />
+          <div className="w-10 h-10 md:w-12 md:h-12 bg-white bg-opacity-90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <Play className="w-4 h-4 md:w-5 md:h-5 text-gray-800 ml-0.5 md:ml-1" />
           </div>
         </div>
         
@@ -36,30 +36,30 @@ export default function VideoCard({ video, onClick }: VideoCardProps) {
       </div>
 
       {/* 비디오 정보 */}
-      <div className="p-4">
-        <h3 className="font-medium text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">
+      <div className="p-3 md:p-4">
+        <h3 className="font-medium text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors text-sm md:text-base">
           {video.title}
         </h3>
         
-        <div className="text-sm text-gray-500 mb-3">
+        <div className="text-xs md:text-sm text-gray-500 mb-2 md:mb-3">
           <div className="flex items-center justify-between">
-            <span className="font-medium text-gray-700">{video.author}</span>
-            <span>{video.createdAt}</span>
+            <span className="font-medium text-gray-700 truncate">{video.author}</span>
+            <span className="text-xs">{video.createdAt}</span>
           </div>
           <div className="flex items-center space-x-4 mt-1">
-            <span>{video.views}회 시청</span>
+            <span>{video.views}회</span>
           </div>
         </div>
 
         {/* 통계 */}
-        <div className="flex items-center justify-between text-sm text-gray-500">
-          <div className="flex items-center space-x-4">
+        <div className="flex items-center justify-between text-xs md:text-sm text-gray-500">
+          <div className="flex items-center space-x-3 md:space-x-4">
             <div className="flex items-center space-x-1">
-              <Heart className="w-4 h-4" />
+              <Heart className="w-3 h-3 md:w-4 md:h-4" />
               <span>{video.likes}</span>
             </div>
             <div className="flex items-center space-x-1">
-              <MessageCircle className="w-4 h-4" />
+              <MessageCircle className="w-3 h-3 md:w-4 md:h-4" />
               <span>{video.comments}</span>
             </div>
           </div>

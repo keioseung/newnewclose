@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Heart, MessageCircle, Share2, Eye, Loader2 } from 'lucide-react';
+import { X, Heart, MessageCircle, Share2, Eye, Loader2, ArrowLeft } from 'lucide-react';
 import { Video } from '@/types/video';
 import toast from 'react-hot-toast';
 
@@ -59,7 +59,17 @@ export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) 
       setCurrentVideo(video);
       // 비디오 조회수 증가
       handleIncrementView();
+      // 모바일에서 스크롤 방지
+      document.body.style.overflow = 'hidden';
+    } else {
+      // 모달이 닫힐 때 스크롤 복원
+      document.body.style.overflow = 'unset';
     }
+
+    // 컴포넌트 언마운트 시 스크롤 복원
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
   }, [video, isOpen]);
 
   const handleIncrementView = async () => {
@@ -105,25 +115,45 @@ export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) 
     }
   };
 
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   if (!isOpen || !currentVideo) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
-        {/* 헤더 */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">{currentVideo.title}</h2>
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50"
+      onClick={handleBackdropClick}
+    >
+      {/* 모바일 최적화된 모달 */}
+      <div className="bg-white w-full h-full md:w-auto md:h-auto md:max-w-4xl md:max-h-[90vh] md:rounded-2xl md:overflow-hidden flex flex-col">
+        {/* 헤더 - 모바일에서는 상단 고정 */}
+        <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-200 bg-white flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors md:hidden"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <h2 className="text-lg md:text-xl font-semibold text-gray-900 truncate">
+              {currentVideo.title}
+            </h2>
+          </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors hidden md:block"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* 비디오 플레이어 */}
-        <div className="relative bg-black">
-          <div className="aspect-video">
+        {/* 비디오 플레이어 - 모바일에서 전체 화면 */}
+        <div className="relative bg-black flex-1">
+          <div className="w-full h-full">
             <iframe
               src={getEmbedUrl(currentVideo.url)}
               title={currentVideo.title}
@@ -135,11 +165,11 @@ export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) 
           </div>
         </div>
 
-        {/* 비디오 정보 */}
-        <div className="p-6 space-y-4">
+        {/* 비디오 정보 - 모바일에서 스크롤 가능 */}
+        <div className="p-4 md:p-6 space-y-4 bg-white flex-shrink-0 max-h-[40vh] md:max-h-none overflow-y-auto">
           {/* 제목과 작성자 */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">
               {currentVideo.title}
             </h3>
             <p className="text-sm text-gray-600">
@@ -148,50 +178,50 @@ export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) 
           </div>
 
           {/* 설명 */}
-          <p className="text-gray-700">{currentVideo.description}</p>
+          <p className="text-gray-700 text-sm md:text-base">{currentVideo.description}</p>
 
-          {/* 통계 */}
-          <div className="flex items-center gap-6 text-sm text-gray-600">
+          {/* 통계 - 모바일에서 더 컴팩트하게 */}
+          <div className="flex items-center gap-4 md:gap-6 text-sm text-gray-600">
             <div className="flex items-center gap-1">
               <Eye className="w-4 h-4" />
-              <span>{currentVideo.views}회 시청</span>
+              <span>{currentVideo.views}회</span>
             </div>
             <div className="flex items-center gap-1">
               <Heart className="w-4 h-4" />
-              <span>{currentVideo.likes}개 좋아요</span>
+              <span>{currentVideo.likes}개</span>
             </div>
             <div className="flex items-center gap-1">
               <MessageCircle className="w-4 h-4" />
-              <span>{currentVideo.comments}개 댓글</span>
+              <span>{currentVideo.comments}개</span>
             </div>
           </div>
 
-          {/* 액션 버튼들 */}
-          <div className="flex items-center gap-4 pt-4 border-t border-gray-200">
+          {/* 액션 버튼들 - 모바일에서 더 큰 터치 영역 */}
+          <div className="flex items-center gap-3 md:gap-4 pt-4 border-t border-gray-200">
             <button
               onClick={handleLike}
               disabled={isLoading}
-              className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 disabled:opacity-50"
+              className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-3 md:py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 disabled:opacity-50 transition-colors"
             >
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 <Heart className="w-4 h-4" />
               )}
-              좋아요
+              <span className="hidden md:inline">좋아요</span>
             </button>
             
-            <button className="flex items-center gap-2 px-4 py-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100">
+            <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-3 md:py-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
               <MessageCircle className="w-4 h-4" />
-              댓글
+              <span className="hidden md:inline">댓글</span>
             </button>
             
             <button
               onClick={handleShare}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100"
+              className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-3 md:py-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
             >
               <Share2 className="w-4 h-4" />
-              공유
+              <span className="hidden md:inline">공유</span>
             </button>
           </div>
 

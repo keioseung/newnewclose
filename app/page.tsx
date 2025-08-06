@@ -13,6 +13,7 @@ export default function Home() {
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<string | undefined>();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleVideoSelect = (video: Video) => {
     setSelectedVideo(video);
@@ -26,20 +27,34 @@ export default function Home() {
 
   const handleGroupSelect = (group: string) => {
     setSelectedGroup(group === '전체' ? undefined : group);
+    // 모바일에서 그룹 선택 시 사이드바 닫기
+    setIsSidebarOpen(false);
   };
 
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* 사이드바 */}
-      <Sidebar onGroupSelect={handleGroupSelect} />
+      {/* 사이드바 - 모바일에서는 오버레이 */}
+      <div className={`
+        fixed inset-0 z-40 md:relative md:z-auto
+        ${isSidebarOpen ? 'block' : 'hidden md:block'}
+      `}>
+        <div className="absolute inset-0 bg-black bg-opacity-50 md:hidden" 
+             onClick={() => setIsSidebarOpen(false)} />
+        <div className="relative h-full md:relative">
+          <Sidebar onGroupSelect={handleGroupSelect} />
+        </div>
+      </div>
       
       {/* 메인 콘텐츠 */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col w-full md:w-auto">
         {/* 헤더 */}
-        <Header onUploadClick={() => setIsUploadModalOpen(true)} />
+        <Header 
+          onUploadClick={() => setIsUploadModalOpen(true)}
+          onMenuClick={() => setIsSidebarOpen(true)}
+        />
         
         {/* 비디오 그리드 */}
-        <main className="flex-1 p-6 overflow-y-auto">
+        <main className="flex-1 p-4 md:p-6 overflow-y-auto">
           <VideoGrid 
             selectedGroup={selectedGroup}
             onVideoSelect={handleVideoSelect}
