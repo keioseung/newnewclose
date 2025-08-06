@@ -3,8 +3,40 @@
 import { useState } from 'react';
 import { X, Upload, Link, Loader2 } from 'lucide-react';
 import { VideoUploadData } from '@/types/video';
-import { videoAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
+
+// Inline API functions
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+const parseVideoUrl = async (url: string): Promise<VideoUploadData> => {
+  const response = await fetch(`${API_BASE_URL}/parse-url`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ url }),
+  });
+
+  if (!response.ok) {
+    throw new Error('URL 파싱에 실패했습니다.');
+  }
+
+  return response.json();
+};
+
+const createVideo = async (videoData: VideoUploadData): Promise<void> => {
+  const response = await fetch(`${API_BASE_URL}/videos`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(videoData),
+  });
+
+  if (!response.ok) {
+    throw new Error('비디오 업로드에 실패했습니다.');
+  }
+};
 
 interface UploadModalProps {
   isOpen: boolean;
@@ -25,7 +57,7 @@ export default function UploadModal({ isOpen, onClose, onVideoUploaded }: Upload
 
     setIsLoading(true);
     try {
-      const videoData = await videoAPI.parseVideoUrl(url);
+      const videoData = await parseVideoUrl(url);
       setParsedVideo(videoData);
       toast.success('URL 파싱이 완료되었습니다!');
     } catch (error) {
@@ -44,7 +76,7 @@ export default function UploadModal({ isOpen, onClose, onVideoUploaded }: Upload
 
     setIsLoading(true);
     try {
-      await videoAPI.createVideo(parsedVideo);
+      await createVideo(parsedVideo);
       toast.success('비디오가 성공적으로 업로드되었습니다!');
       onVideoUploaded();
       handleClose();

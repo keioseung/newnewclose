@@ -3,8 +3,34 @@
 import { useState, useEffect } from 'react';
 import { X, Heart, MessageCircle, Share2, Eye, Loader2 } from 'lucide-react';
 import { Video } from '@/types/video';
-import { videoAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
+
+// Inline API functions
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+const incrementView = async (videoId: string): Promise<Video> => {
+  const response = await fetch(`${API_BASE_URL}/videos/${videoId}/view`, {
+    method: 'POST',
+  });
+
+  if (!response.ok) {
+    throw new Error('조회수 증가에 실패했습니다.');
+  }
+
+  return response.json();
+};
+
+const likeVideo = async (videoId: string): Promise<Video> => {
+  const response = await fetch(`${API_BASE_URL}/videos/${videoId}/like`, {
+    method: 'POST',
+  });
+
+  if (!response.ok) {
+    throw new Error('좋아요 처리에 실패했습니다.');
+  }
+
+  return response.json();
+};
 
 interface VideoModalProps {
   video: Video | null;
@@ -20,15 +46,15 @@ export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) 
     if (video && isOpen) {
       setCurrentVideo(video);
       // 비디오 조회수 증가
-      incrementView();
+      handleIncrementView();
     }
   }, [video, isOpen]);
 
-  const incrementView = async () => {
+  const handleIncrementView = async () => {
     if (!video) return;
     
     try {
-      const updatedVideo = await videoAPI.incrementView(video.id);
+      const updatedVideo = await incrementView(video.id);
       setCurrentVideo(updatedVideo);
     } catch (error) {
       console.error('조회수 증가 실패:', error);
@@ -40,7 +66,7 @@ export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) 
     
     setIsLoading(true);
     try {
-      const updatedVideo = await videoAPI.likeVideo(currentVideo.id);
+      const updatedVideo = await likeVideo(currentVideo.id);
       setCurrentVideo(updatedVideo);
       toast.success('좋아요가 추가되었습니다!');
     } catch (error) {

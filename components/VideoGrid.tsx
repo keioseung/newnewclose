@@ -3,8 +3,30 @@
 import { useState, useEffect } from 'react';
 import { Video } from '@/types/video';
 import VideoCard from './VideoCard';
-import { videoAPI } from '@/lib/api';
 import { Loader2 } from 'lucide-react';
+
+// Inline API functions
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+const getVideos = async (): Promise<Video[]> => {
+  const response = await fetch(`${API_BASE_URL}/videos`);
+  
+  if (!response.ok) {
+    throw new Error('비디오를 불러오는데 실패했습니다.');
+  }
+  
+  return response.json();
+};
+
+const getVideosByGroup = async (group: string): Promise<Video[]> => {
+  const response = await fetch(`${API_BASE_URL}/videos?group=${encodeURIComponent(group)}`);
+  
+  if (!response.ok) {
+    throw new Error('비디오를 불러오는데 실패했습니다.');
+  }
+  
+  return response.json();
+};
 
 interface VideoGridProps {
   selectedGroup?: string;
@@ -24,9 +46,9 @@ export default function VideoGrid({ selectedGroup, onVideoSelect }: VideoGridPro
         
         let fetchedVideos: Video[];
         if (selectedGroup) {
-          fetchedVideos = await videoAPI.getVideosByGroup(selectedGroup);
+          fetchedVideos = await getVideosByGroup(selectedGroup);
         } else {
-          fetchedVideos = await videoAPI.getVideos();
+          fetchedVideos = await getVideos();
         }
         
         setVideos(fetchedVideos);
