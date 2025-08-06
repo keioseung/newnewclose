@@ -101,8 +101,29 @@ async def get_videos():
         
         response = supabase.table('videos').select('*').execute()
         videos = response.data
-        print(f"✅ {len(videos)}개의 비디오 조회 성공")
-        return videos
+        
+        # 프론트엔드 형식에 맞게 데이터 변환
+        formatted_videos = []
+        for video in videos:
+            formatted_video = {
+                'id': video['id'],
+                'title': video['title'],
+                'description': video['description'],
+                'url': video['url'],
+                'thumbnail': video['thumbnail'],
+                'duration': video['duration'],
+                'author': video['author'],
+                'views': video['views'],
+                'likes': video['likes'],
+                'comments': video['comments'],
+                'createdAt': video['created_at'],
+                'group': video['group_name'],
+                'privacy': video['privacy']
+            }
+            formatted_videos.append(formatted_video)
+        
+        print(f"✅ {len(formatted_videos)}개의 비디오 조회 성공")
+        return formatted_videos
     except Exception as e:
         print(f"❌ 비디오 조회 실패: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -116,8 +137,29 @@ async def get_videos_by_group(group: str):
         
         response = supabase.table('videos').select('*').eq('group_name', group).execute()
         videos = response.data
-        print(f"✅ 그룹 '{group}'의 {len(videos)}개 비디오 조회 성공")
-        return videos
+        
+        # 프론트엔드 형식에 맞게 데이터 변환
+        formatted_videos = []
+        for video in videos:
+            formatted_video = {
+                'id': video['id'],
+                'title': video['title'],
+                'description': video['description'],
+                'url': video['url'],
+                'thumbnail': video['thumbnail'],
+                'duration': video['duration'],
+                'author': video['author'],
+                'views': video['views'],
+                'likes': video['likes'],
+                'comments': video['comments'],
+                'createdAt': video['created_at'],
+                'group': video['group_name'],
+                'privacy': video['privacy']
+            }
+            formatted_videos.append(formatted_video)
+        
+        print(f"✅ 그룹 '{group}'의 {len(formatted_videos)}개 비디오 조회 성공")
+        return formatted_videos
     except Exception as e:
         print(f"❌ 그룹별 비디오 조회 실패: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -134,8 +176,26 @@ async def get_video(video_id: str):
             raise HTTPException(status_code=404, detail="Video not found")
         
         video = response.data[0]
+        
+        # 프론트엔드 형식에 맞게 데이터 변환
+        formatted_video = {
+            'id': video['id'],
+            'title': video['title'],
+            'description': video['description'],
+            'url': video['url'],
+            'thumbnail': video['thumbnail'],
+            'duration': video['duration'],
+            'author': video['author'],
+            'views': video['views'],
+            'likes': video['likes'],
+            'comments': video['comments'],
+            'createdAt': video['created_at'],
+            'group': video['group_name'],
+            'privacy': video['privacy']
+        }
+        
         print(f"✅ 비디오 '{video_id}' 조회 성공")
-        return video
+        return formatted_video
     except HTTPException:
         raise
     except Exception as e:
@@ -225,9 +285,27 @@ async def like_video(video_id: str):
         
         # 좋아요 수 업데이트
         response = supabase.table('videos').update({'likes': new_likes}).eq('id', video_id).execute()
-        updated_video = response.data[0]
+        video = response.data[0]
+        
+        # 프론트엔드 형식에 맞게 데이터 변환
+        formatted_video = {
+            'id': video['id'],
+            'title': video['title'],
+            'description': video['description'],
+            'url': video['url'],
+            'thumbnail': video['thumbnail'],
+            'duration': video['duration'],
+            'author': video['author'],
+            'views': video['views'],
+            'likes': video['likes'],
+            'comments': video['comments'],
+            'createdAt': video['created_at'],
+            'group': video['group_name'],
+            'privacy': video['privacy']
+        }
+        
         print(f"✅ 비디오 '{video_id}' 좋아요 증가: {current_likes} → {new_likes}")
-        return updated_video
+        return formatted_video
     except HTTPException:
         raise
     except Exception as e:
@@ -251,9 +329,27 @@ async def increment_view(video_id: str):
         
         # 조회수 업데이트
         response = supabase.table('videos').update({'views': new_views}).eq('id', video_id).execute()
-        updated_video = response.data[0]
+        video = response.data[0]
+        
+        # 프론트엔드 형식에 맞게 데이터 변환
+        formatted_video = {
+            'id': video['id'],
+            'title': video['title'],
+            'description': video['description'],
+            'url': video['url'],
+            'thumbnail': video['thumbnail'],
+            'duration': video['duration'],
+            'author': video['author'],
+            'views': video['views'],
+            'likes': video['likes'],
+            'comments': video['comments'],
+            'createdAt': video['created_at'],
+            'group': video['group_name'],
+            'privacy': video['privacy']
+        }
+        
         print(f"✅ 비디오 '{video_id}' 조회수 증가: {current_views} → {new_views}")
-        return updated_video
+        return formatted_video
     except HTTPException:
         raise
     except Exception as e:
