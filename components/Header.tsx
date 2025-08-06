@@ -1,80 +1,93 @@
 'use client'
 
 import { useState } from 'react'
-import { Search, Plus, Menu, Bell } from 'lucide-react'
+import { Search, Plus, Menu, Bell, BarChart3, Settings, User } from 'lucide-react'
+import SearchBar, { FilterOptions } from './SearchBar'
 
 interface HeaderProps {
   onUploadClick: () => void
   onMenuClick: () => void
+  onStatsClick: () => void
+  onSearch: (query: string) => void
+  onFilterChange: (filters: FilterOptions) => void
 }
 
-export default function Header({ onUploadClick, onMenuClick }: HeaderProps) {
+export default function Header({ onUploadClick, onMenuClick, onStatsClick, onSearch, onFilterChange }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState('')
 
   return (
-    <header className="bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4">
+    <header className="bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4 shadow-soft">
       <div className="flex items-center justify-between">
         {/* 왼쪽 영역 */}
         <div className="flex items-center space-x-3 md:space-x-4">
-          <button 
+          <button
             onClick={onMenuClick}
-            className="p-2 rounded-md hover:bg-gray-100 transition-colors md:hidden"
+            className="p-2 rounded-lg hover:bg-gray-100 transition-all duration-200 md:hidden"
           >
             <Menu className="w-5 h-5 text-gray-600" />
           </button>
           
-          {/* 검색바 - 데스크톱 */}
-          <div className="relative hidden md:block">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="영상 검색..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-2 w-80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
+          {/* 로고 */}
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center shadow-glow">
+              <span className="text-white font-bold text-lg">C</span>
+            </div>
+            <div className="hidden sm:block">
+              <h1 className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">CloseTube</h1>
+              <p className="text-xs text-gray-500">Private Video Sharing</p>
+            </div>
           </div>
         </div>
 
+        {/* 중앙 검색바 */}
+        <div className="flex-1 max-w-2xl mx-4 hidden md:block">
+          <SearchBar onSearch={onSearch} onFilterChange={onFilterChange} />
+        </div>
+
         {/* 오른쪽 영역 */}
-        <div className="flex items-center space-x-2 md:space-x-4">
+        <div className="flex items-center space-x-2 md:space-x-3">
+          {/* 통계 버튼 */}
+          <button
+            onClick={onStatsClick}
+            className="p-2 rounded-lg hover:bg-gray-100 transition-all duration-200 text-gray-600 hover:text-primary-600"
+            title="통계 보기"
+          >
+            <BarChart3 className="w-5 h-5" />
+          </button>
+
           {/* 업로드 버튼 */}
           <button
             onClick={onUploadClick}
-            className="flex items-center space-x-2 bg-primary-500 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-primary-600 transition-colors"
+            className="flex items-center space-x-2 bg-gradient-primary text-white px-4 py-2.5 rounded-xl hover:shadow-glow transition-all duration-200 font-medium"
           >
             <Plus className="w-4 h-4" />
             <span className="hidden sm:inline">영상 업로드</span>
           </button>
 
           {/* 알림 */}
-          <button className="p-2 rounded-md hover:bg-gray-100 transition-colors relative">
+          <button className="p-2 rounded-lg hover:bg-gray-100 transition-all duration-200 relative">
             <Bell className="w-5 h-5 text-gray-600" />
-            <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center font-medium animate-pulse-slow">
+              3
+            </span>
           </button>
 
           {/* 사용자 프로필 */}
-          <div className="flex items-center space-x-2 md:space-x-3">
-            <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm font-medium">마</span>
+          <div className="flex items-center space-x-3">
+            <div className="w-9 h-9 bg-gradient-primary rounded-full flex items-center justify-center shadow-soft">
+              <span className="text-white text-sm font-semibold">마</span>
             </div>
-            <span className="hidden sm:block text-sm font-medium text-gray-700">마루니</span>
+            <div className="hidden sm:block">
+              <p className="text-sm font-medium text-gray-900">마루니</p>
+              <p className="text-xs text-gray-500">Premium</p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* 모바일 검색바 */}
       <div className="mt-3 md:hidden">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="영상 검색..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          />
-        </div>
+        <SearchBar onSearch={onSearch} onFilterChange={onFilterChange} />
       </div>
     </header>
   )
