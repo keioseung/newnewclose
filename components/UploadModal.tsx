@@ -1,276 +1,234 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { X, Upload, Link, Check } from 'lucide-react'
-import { VideoUploadData } from '@/types/video'
-import axios from 'axios'
-import toast from 'react-hot-toast'
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
-
-// API 함수들
-const videoApi = {
-  upload: async (videoData: VideoUploadData) => {
-    const response = await api.post('/videos', videoData)
-    return response.data
-  },
-}
-
-const urlApi = {
-  parseVideoUrl: async (url: string) => {
-    const response = await api.post('/parse-url', { url })
-    return response.data
-  },
-}
+import { useState } from 'react';
+import { X, Upload, Link, Loader2 } from 'lucide-react';
+import { VideoUploadData } from '@/types/video';
+import { videoAPI } from '@/lib/api';
+import toast from 'react-hot-toast';
 
 interface UploadModalProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
+  onVideoUploaded: () => void;
 }
 
-export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
-  const [isLoading, setIsLoading] = useState(false)
-  const [parsedVideo, setParsedVideo] = useState<any>(null)
-  const [isUrlValid, setIsUrlValid] = useState(false)
+export default function UploadModal({ isOpen, onClose, onVideoUploaded }: UploadModalProps) {
+  const [url, setUrl] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [parsedVideo, setParsedVideo] = useState<VideoUploadData | null>(null);
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    reset,
-    formState: { errors },
-  } = useForm<VideoUploadData>()
-
-  const watchedUrl = watch('url')
-
-  // URL 유효성 검사
-  const validateUrl = async (url: string) => {
-    if (!url) {
-      setIsUrlValid(false)
-      setParsedVideo(null)
-      return
+  const handleUrlParse = async () => {
+    if (!url.trim()) {
+      toast.error('URL을 입력해주세요.');
+      return;
     }
 
-    // Mock URL validation
-    if (url.includes('youtube.com') || url.includes('instagram.com') || url.includes('tiktok.com')) {
-      const mockResult = {
-        title: '샘플 영상 제목',
-        description: '샘플 영상 설명입니다.',
-        thumbnail: 'https://via.placeholder.com/320x180/3b82f6/ffffff?text=샘플+영상',
-        duration: '5:30'
-      }
-      setParsedVideo(mockResult)
-      setIsUrlValid(true)
-      setValue('title', mockResult.title)
-    } else {
-      setIsUrlValid(false)
-      setParsedVideo(null)
-    }
-  }
-
-  const onSubmit = async (data: VideoUploadData) => {
-    if (!isUrlValid) {
-      toast.error('유효한 영상 URL을 입력해주세요')
-      return
-    }
-
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      // API 호출 대신 mock 처리
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      toast.success('영상이 성공적으로 업로드되었습니다!')
-      reset()
-      setParsedVideo(null)
-      setIsUrlValid(false)
-      onClose()
+      const videoData = await videoAPI.parseVideoUrl(url);
+      setParsedVideo(videoData);
+      toast.success('URL 파싱이 완료되었습니다!');
     } catch (error) {
-      toast.error('영상 업로드에 실패했습니다. 다시 시도해주세요.')
+      console.error('URL 파싱 실패:', error);
+      toast.error('URL 파싱에 실패했습니다. 올바른 URL인지 확인해주세요.');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
-  if (!isOpen) return null
+  const handleUpload = async () => {
+    if (!parsedVideo) {
+      toast.error('먼저 URL을 파싱해주세요.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await videoAPI.createVideo(parsedVideo);
+      toast.success('비디오가 성공적으로 업로드되었습니다!');
+      onVideoUploaded();
+      handleClose();
+    } catch (error) {
+      console.error('비디오 업로드 실패:', error);
+      toast.error('비디오 업로드에 실패했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleClose = () => {
+    setUrl('');
+    setParsedVideo(null);
+    onClose();
+  };
+
+  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
         {/* 헤더 */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">새 영상 업로드</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">비디오 업로드</h2>
           <button
-            onClick={onClose}
-            className="p-2 rounded-md hover:bg-gray-100 transition-colors"
+            onClick={handleClose}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* 본문 */}
-        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
-          {/* URL 입력 */}
+        {/* URL 입력 */}
+        <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              영상 URL
+              비디오 URL
             </label>
-            <div className="relative">
+            <div className="flex gap-2">
               <input
                 type="url"
-                placeholder="YouTube, Instagram, TikTok 등의 영상 URL을 입력하세요"
-                {...register('url', { 
-                  required: 'URL을 입력해주세요',
-                  onChange: (e) => validateUrl(e.target.value)
-                })}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                  errors.url ? 'border-red-500' : 'border-gray-300'
-                }`}
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="YouTube, Instagram, TikTok URL을 입력하세요"
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                disabled={isLoading}
               />
-              {isUrlValid && (
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <Check className="w-5 h-5 text-green-500" />
-                </div>
-              )}
+              <button
+                onClick={handleUrlParse}
+                disabled={isLoading || !url.trim()}
+                className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {isLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Link className="w-4 h-4" />
+                )}
+                파싱
+              </button>
             </div>
-            {errors.url && (
-              <p className="mt-1 text-sm text-red-600">{errors.url.message}</p>
-            )}
           </div>
 
           {/* 파싱된 비디오 정보 */}
           {parsedVideo && (
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="flex items-start space-x-4">
-                <img
-                  src={parsedVideo.thumbnail}
-                  alt="썸네일"
-                  className="w-24 h-16 object-cover rounded"
+            <div className="bg-gray-50 rounded-lg p-4 space-y-4">
+              <h3 className="font-semibold text-gray-900">비디오 정보</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    제목
+                  </label>
+                  <input
+                    type="text"
+                    value={parsedVideo.title}
+                    onChange={(e) => setParsedVideo({ ...parsedVideo, title: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    작성자
+                  </label>
+                  <input
+                    type="text"
+                    value={parsedVideo.author}
+                    onChange={(e) => setParsedVideo({ ...parsedVideo, author: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    그룹
+                  </label>
+                  <select
+                    value={parsedVideo.group}
+                    onChange={(e) => setParsedVideo({ ...parsedVideo, group: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  >
+                    <option value="가족">가족</option>
+                    <option value="친구들">친구들</option>
+                    <option value="팀 프로젝트">팀 프로젝트</option>
+                    <option value="기타">기타</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    재생 시간
+                  </label>
+                  <input
+                    type="text"
+                    value={parsedVideo.duration}
+                    onChange={(e) => setParsedVideo({ ...parsedVideo, duration: e.target.value })}
+                    placeholder="0:00"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  설명
+                </label>
+                <textarea
+                  value={parsedVideo.description}
+                  onChange={(e) => setParsedVideo({ ...parsedVideo, description: e.target.value })}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
-                <div className="flex-1">
-                  <h4 className="font-medium text-gray-900">{parsedVideo.title}</h4>
-                  <p className="text-sm text-gray-500 mt-1">{parsedVideo.duration}</p>
+              </div>
+
+              {/* 썸네일 미리보기 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  썸네일
+                </label>
+                <div className="flex items-center gap-4">
+                  <img
+                    src={parsedVideo.thumbnail}
+                    alt="Thumbnail"
+                    className="w-32 h-20 object-cover rounded-lg border"
+                  />
+                  <input
+                    type="url"
+                    value={parsedVideo.thumbnail}
+                    onChange={(e) => setParsedVideo({ ...parsedVideo, thumbnail: e.target.value })}
+                    placeholder="썸네일 URL"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
                 </div>
               </div>
             </div>
           )}
 
-          {/* 제목 */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              제목
-            </label>
-            <input
-              type="text"
-              placeholder="영상 제목을 입력하세요"
-              {...register('title', { required: '제목을 입력해주세요' })}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                errors.title ? 'border-red-500' : 'border-gray-300'
-              }`}
-            />
-            {errors.title && (
-              <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
-            )}
-          </div>
-
-          {/* 설명 */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              설명
-            </label>
-            <textarea
-              placeholder="영상에 대한 설명을 입력하세요"
-              rows={3}
-              {...register('description')}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-          </div>
-
-          {/* 공유 그룹 */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              공유 그룹
-            </label>
-            <select
-              {...register('group', { required: '그룹을 선택해주세요' })}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                errors.group ? 'border-red-500' : 'border-gray-300'
-              }`}
-            >
-              <option value="">그룹을 선택하세요</option>
-              <option value="전체">전체</option>
-              <option value="가족">가족</option>
-              <option value="친구들">친구들</option>
-              <option value="팀 프로젝트">팀 프로젝트</option>
-            </select>
-            {errors.group && (
-              <p className="mt-1 text-sm text-red-600">{errors.group.message}</p>
-            )}
-          </div>
-
-          {/* 프라이버시 설정 */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              프라이버시 설정
-            </label>
-            <div className="space-y-3">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  {...register('privacy.downloadDisabled')}
-                  defaultChecked
-                  className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
-                />
-                <span className="ml-3 text-sm text-gray-700">다운로드 금지</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  {...register('privacy.externalShareDisabled')}
-                  defaultChecked
-                  className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
-                />
-                <span className="ml-3 text-sm text-gray-700">외부 공유 금지</span>
-              </label>
-            </div>
-          </div>
-
-          {/* 버튼 */}
-          <div className="flex items-center justify-end space-x-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-            >
-              취소
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading || !isUrlValid}
-              className="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
-            >
-              {isLoading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>업로드 중...</span>
-                </>
-              ) : (
-                <>
+          {/* 업로드 버튼 */}
+          {parsedVideo && (
+            <div className="flex gap-3 pt-4">
+              <button
+                onClick={handleUpload}
+                disabled={isLoading}
+                className="flex-1 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
                   <Upload className="w-4 h-4" />
-                  <span>업로드</span>
-                </>
-              )}
-            </button>
-          </div>
-        </form>
+                )}
+                업로드
+              </button>
+              <button
+                onClick={handleClose}
+                disabled={isLoading}
+                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+              >
+                취소
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
-  )
+  );
 } 
