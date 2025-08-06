@@ -154,17 +154,34 @@ const mockVideos: Video[] = [
 ]
 
 export default function VideoGrid({ currentFilter, onFilterChange, onVideoClick }: VideoGridProps) {
-  const [videos, setVideos] = useState<Video[]>(mockVideos)
+  const [videos, setVideos] = useState<Video[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // API 호출 대신 mock 데이터만 사용
-    setLoading(true)
-    setTimeout(() => {
-      setVideos(mockVideos)
-      setLoading(false)
-    }, 500)
+    const fetchVideos = async () => {
+      setLoading(true)
+      setError(null)
+      
+      try {
+        let response
+        if (['가족', '친구들', '팀 프로젝트'].includes(currentFilter)) {
+          response = await videoApi.getByGroup(currentFilter)
+        } else {
+          response = await videoApi.getAll()
+        }
+        setVideos(response)
+      } catch (err) {
+        console.error('API 호출 실패:', err)
+        setError('데이터를 불러오는데 실패했습니다.')
+        // API 실패 시 mock 데이터 사용
+        setVideos(mockVideos)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchVideos()
   }, [currentFilter])
 
   const filteredVideos = videos.filter(video => {
@@ -193,6 +210,13 @@ export default function VideoGrid({ currentFilter, onFilterChange, onVideoClick 
           </button>
         ))}
       </div>
+
+      {/* 에러 메시지 */}
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="text-red-800 text-sm">{error}</div>
+        </div>
+      )}
 
       {/* 비디오 그리드 */}
       {loading ? (
