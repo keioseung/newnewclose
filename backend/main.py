@@ -25,9 +25,10 @@ app = FastAPI(
 )
 
 # CORS 설정
+origins = os.getenv("CORS_ORIGINS", "*").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 프로덕션에서는 특정 도메인으로 제한
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -253,18 +254,30 @@ async def get_videos_by_group(group: str):
 @app.get("/videos/{video_id}", response_model=VideoResponse)
 async def get_video(video_id: str):
     """특정 비디오를 가져옵니다."""
-    try:
-        video_ref = db.collection('videos').document(video_id)
-        doc = video_ref.get()
-        
-        if not doc.exists:
-            raise HTTPException(status_code=404, detail="비디오를 찾을 수 없습니다")
-        
-        video_data = doc.to_dict()
-        video_data['id'] = doc.id
-        return VideoResponse(**video_data)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"비디오 조회 실패: {str(e)}")
+    # Mock 데이터에서 비디오 찾기
+    mock_data = [
+        {
+            "id": "1",
+            "title": "가족 여행 하이라이트",
+            "description": "올해 여름 가족과 함께한 특별한 여행",
+            "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            "thumbnail": "https://via.placeholder.com/320x180/3b82f6/ffffff?text=가족+여행",
+            "duration": "3:24",
+            "author": "엄마",
+            "views": 12,
+            "likes": 8,
+            "comments": 3,
+            "createdAt": "2일 전",
+            "group": "가족",
+            "privacy": {"downloadDisabled": True, "externalShareDisabled": True}
+        }
+    ]
+    
+    video = next((v for v in mock_data if v["id"] == video_id), None)
+    if not video:
+        raise HTTPException(status_code=404, detail="비디오를 찾을 수 없습니다")
+    
+    return VideoResponse(**video)
 
 @app.post("/videos", response_model=VideoResponse)
 async def create_video(video: VideoCreate):
