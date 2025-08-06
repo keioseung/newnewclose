@@ -14,6 +14,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 애플리케이션 코드 복사
 COPY . .
 
+# 시작 스크립트 실행 권한 부여
+RUN chmod +x start.sh
+
 # 포트 노출
 EXPOSE 8000
 
@@ -21,5 +24,5 @@ EXPOSE 8000
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
-# 애플리케이션 실행
-CMD ["python", "main.py"] 
+# 애플리케이션 실행 (시작 스크립트 사용)
+CMD ["./start.sh"] 
