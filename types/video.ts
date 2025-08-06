@@ -36,6 +36,9 @@ export interface VideoUploadData {
   title: string
   description: string
   url: string
+  thumbnail: string
+  duration: string
+  author: string
   group: string
   privacy: {
     downloadDisabled: boolean
