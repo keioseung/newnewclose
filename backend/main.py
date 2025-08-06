@@ -262,7 +262,7 @@ async def get_groups():
 # Railway 배포를 위한 포트 설정
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.getenv("PORT", 8000))
+    port = int(os.getenv("PORT", 0))  # Railway가 자동으로 포트 할당
     print(f"Starting server on port {port}")
     print("=== CloseTube API Ready ===")
     uvicorn.run(app, host="0.0.0.0", port=port, log_level="info") 

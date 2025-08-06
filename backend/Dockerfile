@@ -17,9 +17,6 @@ COPY . .
 # 시작 스크립트 실행 권한 부여
 RUN chmod +x start.sh
 
-# 포트 노출
-EXPOSE 8000
-
 # 환경변수 설정
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1

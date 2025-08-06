@@ -4,9 +4,10 @@
 echo "PORT: $PORT"
 echo "CORS_ORIGINS: $CORS_ORIGINS"
 
-# 포트 설정 (Railway는 PORT 환경변수를 제공)
+# Railway가 자동으로 PORT 환경변수를 제공
 if [ -z "$PORT" ]; then
-    export PORT=8000
+    echo "Warning: PORT environment variable not set"
+    export PORT=0
 fi
 
 echo "Starting CloseTube API on port $PORT"
