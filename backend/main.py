@@ -264,29 +264,43 @@ async def increment_view(video_id: str):
 async def parse_video_url(url: str = Form(...)):
     """URL에서 비디오 정보를 파싱합니다."""
     try:
-        # 간단한 URL 파싱 (실제로는 더 정교한 파싱이 필요)
-        if "youtube.com" in url or "youtu.be" in url:
+        # URL 파싱 및 임베드 URL 생성
+        if "youtube.com/watch?v=" in url:
             platform = "YouTube"
+            video_id = url.split("v=")[1].split("&")[0]
+            embed_url = f"https://www.youtube.com/embed/{video_id}"
+            thumbnail = f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg"
+        elif "youtu.be/" in url:
+            platform = "YouTube"
+            video_id = url.split("youtu.be/")[1].split("?")[0]
+            embed_url = f"https://www.youtube.com/embed/{video_id}"
+            thumbnail = f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg"
         elif "instagram.com" in url:
             platform = "Instagram"
+            embed_url = url
+            thumbnail = "https://via.placeholder.com/320x180/e4405f/ffffff?text=Instagram+Video"
         elif "tiktok.com" in url:
             platform = "TikTok"
+            embed_url = url
+            thumbnail = "https://via.placeholder.com/320x180/000000/ffffff?text=TikTok+Video"
         else:
             platform = "Unknown"
+            embed_url = url
+            thumbnail = "https://via.placeholder.com/320x180/3b82f6/ffffff?text=Video+Thumbnail"
         
         # 기본 정보 생성
         video_info = {
             "title": f"{platform} 비디오",
             "description": f"{platform}에서 공유된 비디오입니다.",
-            "url": url,
-            "thumbnail": "https://via.placeholder.com/320x180/3b82f6/ffffff?text=Video+Thumbnail",
+            "url": embed_url,  # 임베드 URL 사용
+            "thumbnail": thumbnail,
             "duration": "0:00",
             "author": "사용자",
             "group": "기본",
             "privacy": {"downloadDisabled": True, "externalShareDisabled": True}
         }
         
-        print(f"✅ URL 파싱 성공: {platform}")
+        print(f"✅ URL 파싱 성공: {platform} - {embed_url}")
         return video_info
     except Exception as e:
         print(f"❌ URL 파싱 실패: {e}")

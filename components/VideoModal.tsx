@@ -32,6 +32,18 @@ const likeVideo = async (videoId: string): Promise<Video> => {
   return response.json();
 };
 
+// YouTube URL을 임베드 URL로 변환하는 함수
+const getEmbedUrl = (url: string): string => {
+  if (url.includes('youtube.com/watch?v=')) {
+    const videoId = url.split('v=')[1]?.split('&')[0];
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
+  } else if (url.includes('youtu.be/')) {
+    const videoId = url.split('youtu.be/')[1]?.split('?')[0];
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
+  }
+  return url;
+};
+
 interface VideoModalProps {
   video: Video | null;
   isOpen: boolean;
@@ -113,7 +125,7 @@ export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) 
         <div className="relative bg-black">
           <div className="aspect-video">
             <iframe
-              src={currentVideo.url}
+              src={getEmbedUrl(currentVideo.url)}
               title={currentVideo.title}
               className="w-full h-full"
               frameBorder="0"
