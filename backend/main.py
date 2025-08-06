@@ -320,6 +320,9 @@ async def get_groups():
     # Mock 그룹 데이터 반환
     return mock_groups
 
+# Railway 배포를 위한 포트 설정
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000) 
+    port = int(os.getenv("PORT", 8000))
+    print(f"Starting server on port {port}")
+    uvicorn.run(app, host="0.0.0.0", port=port, log_level="info") 
