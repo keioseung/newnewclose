@@ -2,10 +2,9 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# 시스템 의존성 설치
+# 시스템 의존성 설치 (최소화)
 RUN apt-get update && apt-get install -y \
     gcc \
-    g++ \
     && rm -rf /var/lib/apt/lists/*
 
 # Python 의존성 설치
@@ -18,5 +17,9 @@ COPY . .
 # 포트 노출
 EXPOSE 8000
 
-# 애플리케이션 실행 (Railway PORT 환경변수 사용)
+# 환경변수 설정
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# 애플리케이션 실행
 CMD ["python", "main.py"] 

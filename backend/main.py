@@ -1,14 +1,9 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import List, Optional
 import os
-from datetime import datetime, timedelta
-import re
-import requests
-from bs4 import BeautifulSoup
-import yt_dlp
+from datetime import datetime
 
 # Mock 데이터 저장소
 mock_videos = []
@@ -67,118 +62,51 @@ class UrlParseResponse(BaseModel):
     duration: str
     author: str
 
-# URL 파싱 함수
+# 간단한 URL 파싱 함수 (yt-dlp 없이)
 def parse_video_url(url: str) -> dict:
-    """YouTube, Instagram, TikTok 등의 URL에서 비디오 정보를 추출합니다."""
+    """간단한 URL 파싱 (yt-dlp 없이)"""
     
-    # YouTube URL 패턴
-    youtube_pattern = r'(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)'
-    youtube_match = re.search(youtube_pattern, url)
-    
-    if youtube_match:
-        video_id = youtube_match.group(1)
-        try:
-            ydl_opts = {
-                'quiet': True,
-                'no_warnings': True,
-                'extract_flat': True,
-            }
-            
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(url, download=False)
-                
-                return {
-                    "title": info.get('title', 'Unknown Title'),
-                    "description": info.get('description', ''),
-                    "thumbnail": info.get('thumbnail', ''),
-                    "duration": str(info.get('duration', 0)),
-                    "author": info.get('uploader', 'Unknown Author')
-                }
-        except Exception as e:
-            print(f"Error parsing YouTube URL: {e}")
-            return {
-                "title": "YouTube Video",
-                "description": "",
-                "thumbnail": f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg",
-                "duration": "0",
-                "author": "Unknown Author"
-            }
-    
-    # Instagram URL 패턴
-    instagram_pattern = r'instagram\.com\/p\/([a-zA-Z0-9_-]+)'
-    instagram_match = re.search(instagram_pattern, url)
-    
-    if instagram_match:
-        try:
-            response = requests.get(url)
-            soup = BeautifulSoup(response.content, 'html.parser')
-            
-            # Instagram 메타데이터 추출
-            title = soup.find('meta', property='og:title')
-            description = soup.find('meta', property='og:description')
-            image = soup.find('meta', property='og:image')
-            
-            return {
-                "title": title.get('content', 'Instagram Post') if title else "Instagram Post",
-                "description": description.get('content', '') if description else "",
-                "thumbnail": image.get('content', '') if image else "",
-                "duration": "0",
-                "author": "Instagram User"
-            }
-        except Exception as e:
-            print(f"Error parsing Instagram URL: {e}")
-            return {
-                "title": "Instagram Post",
-                "description": "",
-                "thumbnail": "",
-                "duration": "0",
-                "author": "Instagram User"
-            }
-    
-    # TikTok URL 패턴
-    tiktok_pattern = r'tiktok\.com\/@[^\/]+\/video\/(\d+)'
-    tiktok_match = re.search(tiktok_pattern, url)
-    
-    if tiktok_match:
-        try:
-            response = requests.get(url)
-            soup = BeautifulSoup(response.content, 'html.parser')
-            
-            # TikTok 메타데이터 추출
-            title = soup.find('meta', property='og:title')
-            description = soup.find('meta', property='og:description')
-            image = soup.find('meta', property='og:image')
-            
-            return {
-                "title": title.get('content', 'TikTok Video') if title else "TikTok Video",
-                "description": description.get('content', '') if description else "",
-                "thumbnail": image.get('content', '') if image else "",
-                "duration": "0",
-                "author": "TikTok User"
-            }
-        except Exception as e:
-            print(f"Error parsing TikTok URL: {e}")
-            return {
-                "title": "TikTok Video",
-                "description": "",
-                "thumbnail": "",
-                "duration": "0",
-                "author": "TikTok User"
-            }
-    
-    # 기본 응답
-    return {
-        "title": "Unknown Video",
-        "description": "",
-        "thumbnail": "",
-        "duration": "0",
-        "author": "Unknown Author"
-    }
+    if "youtube.com" in url or "youtu.be" in url:
+        return {
+            "title": "YouTube Video",
+            "description": "YouTube에서 가져온 영상입니다.",
+            "thumbnail": "https://via.placeholder.com/320x180/ff0000/ffffff?text=YouTube",
+            "duration": "5:30",
+            "author": "YouTube User"
+        }
+    elif "instagram.com" in url:
+        return {
+            "title": "Instagram Post",
+            "description": "Instagram에서 가져온 포스트입니다.",
+            "thumbnail": "https://via.placeholder.com/320x180/e4405f/ffffff?text=Instagram",
+            "duration": "0:30",
+            "author": "Instagram User"
+        }
+    elif "tiktok.com" in url:
+        return {
+            "title": "TikTok Video",
+            "description": "TikTok에서 가져온 영상입니다.",
+            "thumbnail": "https://via.placeholder.com/320x180/000000/ffffff?text=TikTok",
+            "duration": "1:00",
+            "author": "TikTok User"
+        }
+    else:
+        return {
+            "title": "Unknown Video",
+            "description": "알 수 없는 영상입니다.",
+            "thumbnail": "https://via.placeholder.com/320x180/666666/ffffff?text=Video",
+            "duration": "3:00",
+            "author": "Unknown Author"
+        }
 
 # API 엔드포인트들
 @app.get("/")
 async def root():
-    return {"message": "CloseTube API is running!"}
+    return {"message": "CloseTube API is running!", "status": "healthy"}
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "timestamp": datetime.now().isoformat()}
 
 @app.post("/parse-url", response_model=UrlParseResponse)
 async def parse_url(request: UrlParseRequest):
