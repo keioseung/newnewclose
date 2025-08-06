@@ -9,6 +9,9 @@ import VideoModal from '@/components/VideoModal';
 import StatsDashboard from '@/components/StatsDashboard';
 import RecommendModal from '@/components/RecommendModal';
 import MemoryBox from '@/components/MemoryBox';
+import CommentSection from '@/components/CommentSection';
+import NotificationCenter from '@/components/NotificationCenter';
+import FriendManager from '@/components/FriendManager';
 import { Video } from '@/types/video';
 import { FilterOptions } from '@/components/SearchBar';
 import { RecommendationData } from '@/components/RecommendModal';
@@ -23,6 +26,9 @@ export default function Home() {
   const [isStatsOpen, setIsStatsOpen] = useState(false);
   const [isRecommendOpen, setIsRecommendOpen] = useState(false);
   const [isMemoryOpen, setIsMemoryOpen] = useState(false);
+  const [isCommentOpen, setIsCommentOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isFriendManagerOpen, setIsFriendManagerOpen] = useState(false);
   const [selectedVideoForAction, setSelectedVideoForAction] = useState<Video | null>(null);
   const [videos, setVideos] = useState<Video[]>([]);
   const [filteredVideos, setFilteredVideos] = useState<Video[]>([]);
@@ -164,6 +170,12 @@ export default function Home() {
     }
   };
 
+  const handleCommentClick = () => {
+    if (selectedVideo) {
+      setIsCommentOpen(true);
+    }
+  };
+
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* 사이드바 - 모바일에서는 오버레이 */}
@@ -186,6 +198,8 @@ export default function Home() {
           onMenuClick={() => setIsSidebarOpen(true)}
           onStatsClick={() => setIsStatsOpen(true)}
           onMemoryClick={() => setIsMemoryOpen(true)}
+          onNotificationClick={() => setIsNotificationOpen(true)}
+          onFriendClick={() => setIsFriendManagerOpen(true)}
           onSearch={handleSearch}
           onFilterChange={handleFilterChange}
         />
@@ -216,6 +230,7 @@ export default function Home() {
           setIsVideoModalOpen(false);
           setSelectedVideo(null);
         }}
+        onCommentClick={handleCommentClick}
       />
 
       {/* 통계 대시보드 */}
@@ -244,6 +259,25 @@ export default function Home() {
           setSelectedVideoForAction(null);
         }}
         onSaveMemory={handleSaveMemorySubmit}
+      />
+
+      {/* 댓글 섹션 */}
+      <CommentSection
+        videoId={selectedVideo?.id || ''}
+        isOpen={isCommentOpen}
+        onClose={() => setIsCommentOpen(false)}
+      />
+
+      {/* 알림 센터 */}
+      <NotificationCenter
+        isOpen={isNotificationOpen}
+        onClose={() => setIsNotificationOpen(false)}
+      />
+
+      {/* 친구 관리 */}
+      <FriendManager
+        isOpen={isFriendManagerOpen}
+        onClose={() => setIsFriendManagerOpen(false)}
       />
     </div>
   );

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Search, Plus, Menu, Bell, BarChart3, Settings, User, Heart } from 'lucide-react'
+import { Search, Plus, Menu, Bell, BarChart3, Settings, User, Heart, Users } from 'lucide-react'
 import SearchBar, { FilterOptions } from './SearchBar'
 
 interface HeaderProps {
@@ -9,11 +9,13 @@ interface HeaderProps {
   onMenuClick: () => void
   onStatsClick: () => void
   onMemoryClick: () => void
+  onNotificationClick: () => void
+  onFriendClick: () => void
   onSearch: (query: string) => void
   onFilterChange: (filters: FilterOptions) => void
 }
 
-export default function Header({ onUploadClick, onMenuClick, onStatsClick, onMemoryClick, onSearch, onFilterChange }: HeaderProps) {
+export default function Header({ onUploadClick, onMenuClick, onStatsClick, onMemoryClick, onNotificationClick, onFriendClick, onSearch, onFilterChange }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState('')
 
   return (
@@ -65,6 +67,15 @@ export default function Header({ onUploadClick, onMenuClick, onStatsClick, onMem
             <Heart className="w-5 h-5" />
           </button>
 
+          {/* 친구 관리 버튼 */}
+          <button
+            onClick={onFriendClick}
+            className="p-2 rounded-lg hover:bg-gray-100 transition-all duration-200 text-gray-600 hover:text-primary-600"
+            title="친구 관리"
+          >
+            <Users className="w-5 h-5" />
+          </button>
+
           {/* 업로드 버튼 */}
           <button
             onClick={onUploadClick}
@@ -75,7 +86,10 @@ export default function Header({ onUploadClick, onMenuClick, onStatsClick, onMem
           </button>
 
           {/* 알림 */}
-          <button className="p-2 rounded-lg hover:bg-gray-100 transition-all duration-200 relative">
+          <button 
+            onClick={onNotificationClick}
+            className="p-2 rounded-lg hover:bg-gray-100 transition-all duration-200 relative"
+          >
             <Bell className="w-5 h-5 text-gray-600" />
             <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center font-medium animate-pulse-slow">
               3

@@ -65,9 +65,10 @@ interface VideoModalProps {
   video: Video | null;
   isOpen: boolean;
   onClose: () => void;
+  onCommentClick?: () => void;
 }
 
-export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) {
+export default function VideoModal({ video, isOpen, onClose, onCommentClick }: VideoModalProps) {
   const [currentVideo, setCurrentVideo] = useState<Video | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -228,7 +229,10 @@ export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) 
               <span className="hidden md:inline">좋아요</span>
             </button>
             
-            <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-3 md:py-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
+            <button 
+              onClick={onCommentClick}
+              className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-3 md:py-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
+            >
               <MessageCircle className="w-4 h-4" />
               <span className="hidden md:inline">댓글</span>
             </button>
