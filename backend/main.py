@@ -31,7 +31,17 @@ app = FastAPI(
 )
 
 # CORS 설정
-origins = os.getenv("CORS_ORIGINS", "https://newclose-production.up.railway.app").split(",")
+origins = [
+    "https://newclose-production.up.railway.app",
+    "http://localhost:3000",
+    "https://localhost:3000"
+]
+
+# 환경변수에서 추가 origins 가져오기
+env_origins = os.getenv("CORS_ORIGINS", "")
+if env_origins:
+    origins.extend(env_origins.split(","))
+
 print(f"CORS origins: {origins}")
 
 app.add_middleware(
