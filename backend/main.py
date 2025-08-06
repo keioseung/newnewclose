@@ -365,24 +365,38 @@ async def parse_video_url(url: str = Form(...)):
             platform = "YouTube"
             video_id = url.split("v=")[1].split("&")[0]
             embed_url = f"https://www.youtube.com/embed/{video_id}"
+            # YouTube 썸네일 (고화질 우선, 실패시 중화질)
             thumbnail = f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg"
+            # 백업 썸네일들
+            backup_thumbnails = [
+                f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg",
+                f"https://img.youtube.com/vi/{video_id}/mqdefault.jpg",
+                f"https://img.youtube.com/vi/{video_id}/sddefault.jpg"
+            ]
         elif "youtu.be/" in url:
             platform = "YouTube"
             video_id = url.split("youtu.be/")[1].split("?")[0]
             embed_url = f"https://www.youtube.com/embed/{video_id}"
+            # YouTube 썸네일 (고화질 우선, 실패시 중화질)
             thumbnail = f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg"
+            # 백업 썸네일들
+            backup_thumbnails = [
+                f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg",
+                f"https://img.youtube.com/vi/{video_id}/mqdefault.jpg",
+                f"https://img.youtube.com/vi/{video_id}/sddefault.jpg"
+            ]
         elif "instagram.com" in url:
             platform = "Instagram"
             embed_url = url
-            thumbnail = "https://via.placeholder.com/320x180/e4405f/ffffff?text=Instagram+Video"
+            thumbnail = "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=320&h=180&fit=crop&crop=center"
         elif "tiktok.com" in url:
             platform = "TikTok"
             embed_url = url
-            thumbnail = "https://via.placeholder.com/320x180/000000/ffffff?text=TikTok+Video"
+            thumbnail = "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=320&h=180&fit=crop&crop=center"
         else:
             platform = "Unknown"
             embed_url = url
-            thumbnail = "https://via.placeholder.com/320x180/3b82f6/ffffff?text=Video+Thumbnail"
+            thumbnail = "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=320&h=180&fit=crop&crop=center"
         
         # 기본 정보 생성
         video_info = {

@@ -20,6 +20,20 @@ export default function VideoCard({ video, onClick }: VideoCardProps) {
           src={video.thumbnail}
           alt={video.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          onError={(e) => {
+            // 썸네일 로딩 실패 시 기본 이미지로 대체
+            const target = e.target as HTMLImageElement;
+            if (video.url.includes('youtube.com') || video.url.includes('youtu.be')) {
+              // YouTube 비디오인 경우 다른 해상도 시도
+              const videoId = video.url.includes('v=') 
+                ? video.url.split('v=')[1].split('&')[0]
+                : video.url.split('youtu.be/')[1].split('?')[0];
+              target.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+            } else {
+              // 기본 썸네일
+              target.src = 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=320&h=180&fit=crop&crop=center';
+            }
+          }}
         />
         
         {/* 재생 오버레이 */}

@@ -63,11 +63,13 @@ CREATE TRIGGER update_videos_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
--- Insert sample data
+-- Insert sample data with better thumbnails
 INSERT INTO videos (title, description, url, thumbnail, duration, author, group_name) VALUES
-('가족 여행 하이라이트', '올해 여름 가족과 함께한 특별한 여행', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'https://via.placeholder.com/320x180/3b82f6/ffffff?text=가족+여행', '3:24', '엄마', '가족'),
-('파스타 만들기 클래스', '집에서 쉽게 만드는 맛있는 파스타', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'https://via.placeholder.com/320x180/10b981/ffffff?text=요리+클래스', '8:15', '친구 민수', '친구들'),
-('팀 프로젝트 브레인스토밍', '새로운 아이디어를 위한 팀 회의', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'https://via.placeholder.com/320x180/f59e0b/ffffff?text=프로젝트+회의', '15:32', '팀장 지영', '팀 프로젝트');
+('가족 여행 하이라이트', '올해 여름 가족과 함께한 특별한 여행', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg', '3:24', '엄마', '가족'),
+('파스타 만들기 클래스', '집에서 쉽게 만드는 맛있는 파스타', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg', '8:15', '친구 민수', '친구들'),
+('팀 프로젝트 브레인스토밍', '새로운 아이디어를 위한 팀 회의', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg', '15:32', '팀장 지영', '팀 프로젝트'),
+('자연 속 힐링 영상', '아름다운 자연 풍경과 함께하는 힐링 시간', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=320&h=180&fit=crop&crop=center', '5:42', '자연사랑', '힐링'),
+('요리 레시피 모음', '집에서 쉽게 따라할 수 있는 요리 레시피', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=320&h=180&fit=crop&crop=center', '12:18', '요리왕', '요리');
 
 -- Verify the table was created successfully
 SELECT 'Table videos created successfully' as status;
