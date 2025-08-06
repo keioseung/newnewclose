@@ -6,7 +6,7 @@ import VideoCard from './VideoCard';
 import { Loader2 } from 'lucide-react';
 
 // Inline API functions
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://mcp-hi.up.railway.app';
+const API_BASE_URL = 'https://mcp-hi.up.railway.app';
 
 const getVideos = async (): Promise<Video[]> => {
   const response = await fetch(`${API_BASE_URL}/videos`);

@@ -34,7 +34,10 @@ app = FastAPI(
 origins = [
     "https://newclose-production.up.railway.app",
     "http://localhost:3000",
-    "https://localhost:3000"
+    "https://localhost:3000",
+    "http://localhost:8080",
+    "https://localhost:8080",
+    "*"  # 임시로 모든 origin 허용 (개발 중)
 ]
 
 # 환경변수에서 추가 origins 가져오기
@@ -46,8 +49,8 @@ print(f"CORS origins: {origins}")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
+    allow_origins=["*"],  # 임시로 모든 origin 허용
+    allow_credentials=False,  # allow_origins=["*"]일 때는 False여야 함
     allow_methods=["*"],
     allow_headers=["*"],
 )
